@@ -1,0 +1,105 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from shapely.geometry import LineString
+
+def onclick(event):
+    ix,iy=event.xdata,event.ydata
+    print((ix,iy))
+    return
+
+from matplotlib.widgets import  Cursor, Button
+
+# Define the parameter value
+E=70 #GPa --> Young's modulus for old oceanic lithosphere
+v=0.25 #Poisson's Ratio for old oceanic lithosphere
+rho_mantle=3.3 #g cm^-3
+rho_water=1000 #kgm^-3
+g=9.81 #m s^-2
+pi=3.14
+
+# Import the topographic data for the profiles
+# For instance, I use 8 profiles here to see the differences in the plate flexure
+
+# This is for defining the penetration of faulting trenchward of the outer-rise region
+cursor= Cursor(ax,
+               horizOn=True,
+               vertOn=True,
+               color='blue',
+               linewidth=1.0)
+
+cid = fig1.canvas.mpl_connect('button_press_event', onclick)
+
+# Example of the result from observing the penetration of the fault
+ax.plot([0, 600000], [-5567.67, -5567.67],c='black') # Plot 1, y0=109717.74, y at wb=198098.7399193548, -4921.552821451559
+# Do this for the 8 profiles
+# From this observation, we will obtain the x0, y0, y at wb for 8 profiles 
+# Define an array to store the results
+
+# Calculate the average of the wb
+wb=mean_yb-mean_y
+wb1=yb1-y0_1
+
+x_array= np.arange(-100000,600000)
+
+
+# Calculation for each profile
+# for i in enumerate(xb_array):
+# eq4_pt1=(np.sqrt(2)*np.exp(3.14/4))
+# eq4_pt2= np.exp((-3.14/4)*((x_array)/(xb2)))
+# eq4_pt3= np.sin((3.14/4)*((x_array)/(xb2)))
+    
+# Define an array to store the results
+w_arrays = []
+
+# Calculate flexure model for the average profile
+eq4_pt1_avg = (np.sqrt(2) * np.exp(3.14 / 4))
+eq4_pt2_avg = np.exp((-3.14 / 4) * (x_array / mean_xb))
+eq4_pt3_avg = np.sin((3.14 / 4) * (x_array / mean_xb))
+w_array_avg = wb * eq4_pt1_avg * eq4_pt2_avg * eq4_pt3_avg
+
+# Create x_array with the same length as w_array_avg
+x_array_avg = np.linspace(0, 600000, len(w_array_avg))
+
+# Plot the flexure model for the average profile
+ax.plot(x_array_avg, w_array_avg, label='Flexure Model (Average Profile)', color='blue', linestyle='dashdot')
+# Define arrays to store alpha, rigidity, and elastic_thickness for each profile
+alpha_values = []
+rigidity_values = []
+elastic_thickness_values = []
+
+###
+# Elastic thickness for topographic profiles is determined by measuring the distance between the first zero
+# crossing and the outer rise peak x_b after assigning a baseline local depth
+# Calculation for each profile
+for xb in xb_array:
+    eq4_pt1 = (np.sqrt(2) * np.exp(3.14 / 4))
+    eq4_pt2 = np.exp((-3.14 / 4) * (x_array / xb))
+    eq4_pt3 = np.sin((3.14 / 4) * (x_array / xb))
+    w_array = wb * eq4_pt1 * eq4_pt2 * eq4_pt3
+    w_arrays.append(w_array)
+    
+    # Calculate alpha
+    alpha = (4 * (xb) / pi)
+    alpha_values.append(alpha)
+
+    # Calculate rigidity
+    rigidity = np.abs(((rho_mantle - rho_water) * g / 4) * alpha**4)
+    rigidity_values.append(rigidity)
+
+    # Calculate elastic thickness
+    elastic_thickness = ((12 * (1 - v**2)* rigidity/ E))**(1/3)
+    elastic_thickness_values.append(elastic_thickness)
+
+# Plot profile by flattening the 2D array of subplots for easier iteration
+
+for i, (w_array, profile_shift) in enumerate(zip(w_arrays, [Profile_1_shift, Profile_2_shift, Profile_3_shift, Profile_4_shift, Profile_5_shift, Profile_6_shift, Profile_7_shift, Profile_8_shift])):
+    ax = axs[i]
+    ax.plot(profile_shift[:, 0], profile_shift[:, 1], label=f'Profile {i+1}', color='black', linestyle='solid')
+    ax.plot(x_array, w_array, label='w_array', color='blue', linestyle='dashdot')
+    ax.set_title(f'Profile {i+1}')
+    ax.set_xlabel('Distance from trench axis (m)')
+    ax.set_ylabel('Topography (m)')
+
+axs[0].legend()
+plt.tight_layout()
+plt.show()
