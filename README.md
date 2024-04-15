@@ -1,4 +1,5 @@
 **1. Modelling Elastic Thickness of a Subducting Plate**
+
 For this part of the code, the chosen study area is the Kuril-Kamchatka Trench.
 This study area offers complex geological phenomenon, because when the bending-induced stress exceeds the lithosphere's yield strength, it becomes an important factor for penetration of faulting trenchward of the outer-rise region.
 For this practical, the description of the flexure of a broken plate that estimates the bending plate profile is defined by the bathymetry data from the Kuril-Kamchatka subduction zone trench.
